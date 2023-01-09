@@ -73,3 +73,25 @@ class WikiMapper:
             results = c.fetchall()
 
         return [e[0] for e in results]
+
+
+    def pid_to_id(self, wikipedia_id: str) -> Optional[str]:
+        """Given a Wikipedia ID, return the Wikidata ID that is linked to it.
+
+        Args:
+            wikipedia_id (str): The Wikidata ID to map, e.g. `339`.
+
+        Returns:
+            Optional[str]: The Wikidata ID that is linked to this Wikipedia ID, e.g. `Q132524`.
+
+        """
+        with sqlite3.connect(self._path_to_db) as conn:
+            c = conn.cursor()
+            c.execute(
+                "SELECT DISTINCT wikidata_id FROM mapping WHERE wikipedia_id =?", (wikipedia_id,)
+            )
+            results = c.fetchall()
+        if len(results) == 0:
+            return None
+        else:
+            return results[0][0]
