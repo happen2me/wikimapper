@@ -129,7 +129,7 @@ def create_index(dumpname: str, path_to_dumps: str, path_to_db: str = None) -> s
         conn.execute(
             """CREATE TABLE mapping (
             wikipedia_id int PRIMARY KEY ,
-            wikipedia_title text,
+            wikipedia_title text COLLATE NOCASE,
             wikidata_id text)"""
         )
 
