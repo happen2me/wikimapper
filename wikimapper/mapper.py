@@ -8,7 +8,7 @@ class WikiMapper:
     def __init__(self, path_to_db: str):
         self._path_to_db = path_to_db
 
-    def title_to_id(self, page_title: str) -> Optional[str]:
+    def title_to_id(self, page_title: str, uncased=False) -> Optional[str]:
         """Given a Wikipedia page title, returns the corresponding Wikidata ID.
 
         The page title is the last part of a Wikipedia url **unescaped** and spaces
@@ -17,6 +17,8 @@ class WikiMapper:
 
         Args:
             page_title: The page title of the Wikipedia entry, e.g. `Manatee`.
+            uncased (bool): Whether to ignore case when looking up the title. The speed drops
+                significantly when this is set to `True`.
 
         Returns:
             Optional[str]: If a mapping could be found for `wiki_page_title`, then return
@@ -26,7 +28,8 @@ class WikiMapper:
 
         with sqlite3.connect(self._path_to_db) as conn:
             c = conn.cursor()
-            c.execute("SELECT wikidata_id FROM mapping WHERE wikipedia_title=?", (page_title,))
+            command = f"SELECT wikidata_id FROM mapping WHERE wikipedia_title=? {'COLLATE NOCASE' if uncased else ''}"
+            c.execute(command, (page_title,))
             result = c.fetchone()
 
         if result is not None and result[0] is not None:
