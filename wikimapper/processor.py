@@ -160,7 +160,7 @@ def create_index(dumpname: str, path_to_dumps: str, path_to_db: str = None) -> s
     # We create this index here as all titles have been inserted now.
     # Doing it earlier would recreate the index on every title insert.
     _logger.info("Creating database index on 'wikipedia_title'")
-    conn.execute("""CREATE UNIQUE INDEX idx_wikipedia_title ON mapping(wikipedia_title);""")
+    conn.execute("""CREATE INDEX idx_wikipedia_title ON mapping(wikipedia_title);""")
     conn.commit()
 
     # Parse the Wikipedia page property dump; extract page id and Wikidata id from the sql

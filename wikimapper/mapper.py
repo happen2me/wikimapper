@@ -30,12 +30,15 @@ class WikiMapper:
             c = conn.cursor()
             command = f"SELECT wikidata_id FROM mapping WHERE wikipedia_title=? {'COLLATE NOCASE' if uncased else ''}"
             c.execute(command, (page_title,))
-            result = c.fetchone()
+            results = c.fetchall()
 
-        if result is not None and result[0] is not None:
-            return result[0]
-        else:
+        if len(results) == 0:
             return None
+        # Because the UNIQUE constraint on the mapping table is not enforced, we need to
+        # check for multiple results and return the first non-None value.
+        if any((item[0] for item in results)):
+            return next((item[0] for item in results if item[0]))
+        return None
 
     def url_to_id(self, wiki_url: str) -> Optional[str]:
         """Given an URL to a Wikipedia page, returns the corresponding Wikidata ID.
